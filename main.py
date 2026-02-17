@@ -1,23 +1,23 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import shutil, os, uuid
+import requests
+from dotenv import load_dotenv
 
-# loaders
+# Load API keys
+load_dotenv()
+HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+
+# LangChain loaders & vectorstore
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# vector store
 from langchain_community.vectorstores import FAISS
-
-# embeddings
-from langchain_huggingface import HuggingFaceEmbeddings
 
 # LLM
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 app = FastAPI()
 
-# allow frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,27 +26,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#API
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-# store sessions in RAM (temporary)
+# store sessions in RAM
 sessions = {}
 
-# embeddings
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
-
-# llm
+# LLM
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     temperature=0.2
 )
+
+# ---------------- HF API Embeddings ----------------
+def get_embeddings(texts):
+    url = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+    headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+    payload = {"inputs": texts}
+    response = requests.post(url, headers=headers, json=payload)
+    if response.status_code != 200:
+        raise HTTPException(status_code=503, detail="HF API Error")
+    return response.json()
 
 # ---------------- CREATE SESSION ----------------
 @app.get("/session")
@@ -54,7 +53,6 @@ def create_session():
     session_id = str(uuid.uuid4())
     sessions[session_id] = None
     return {"session_id": session_id}
-
 
 # ---------------- UPLOAD PDF ----------------
 @app.post("/upload")
@@ -73,12 +71,17 @@ async def upload_pdf(session_id: str = Form(...), file: UploadFile = File(...)):
     )
     chunks = splitter.split_documents(docs)
 
-    vector_db = FAISS.from_documents(chunks, embeddings)
+    # Compute embeddings via HF API
+    embeddings_list = [get_embeddings(d.page_content)[0] for d in chunks]
+
+    vector_db = FAISS.from_texts([d.page_content for d in chunks], embeddings_list)
 
     sessions[session_id] = vector_db
 
-    return {"message": "PDF processed successfully"}
+    # Clean up PDF
+    os.remove(file_path)
 
+    return {"message": "PDF processed successfully"}
 
 # ---------------- ASK QUESTION ----------------
 @app.post("/ask")
@@ -106,8 +109,6 @@ Question:
 {query}
 """
 
-    from fastapi import HTTPException
-
     try:
         response = llm.invoke(prompt)
         answer = response.content
@@ -121,8 +122,6 @@ Question:
 
 if __name__ == "__main__":
     import uvicorn
-    import os
-    # Render assigns a port automatically in the PORT environment variable
     port = int(os.environ.get("PORT", 10000))
-    print(f"Starting server on port {port}...") # This will show in logs
+    print(f"Starting server on port {port}...")
     uvicorn.run(app, host="0.0.0.0", port=port)
