@@ -12,8 +12,8 @@ function App() {
   const [pageLoaded, setPageLoaded] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // const API = "http://127.0.0.1:8000";
-  const API = import.meta.env.VITE_API_URL;
+  const API = "https://amit0310-rag-project.hf.space";
+  // const API = import.meta.env.VITE_API_URL;
 
 
   // Welcome animation on load
