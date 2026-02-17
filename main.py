@@ -55,33 +55,71 @@ def create_session():
     return {"session_id": session_id}
 
 # ---------------- UPLOAD PDF ----------------
+# @app.post("/upload")
+# async def upload_pdf(session_id: str = Form(...), file: UploadFile = File(...)):
+
+#     file_path = f"temp_{session_id}.pdf"
+#     with open(file_path, "wb") as buffer:
+#         shutil.copyfileobj(file.file, buffer)
+
+#     loader = PyPDFLoader(file_path)
+#     docs = loader.load()
+
+#     splitter = RecursiveCharacterTextSplitter(
+#         chunk_size=900,
+#         chunk_overlap=200
+#     )
+#     chunks = splitter.split_documents(docs)
+
+#     # Compute embeddings via HF API
+#     embeddings_list = [get_embeddings(d.page_content)[0] for d in chunks]
+
+#     vector_db = FAISS.from_texts([d.page_content for d in chunks], embeddings_list)
+
+#     sessions[session_id] = vector_db
+
+#     # Clean up PDF
+#     os.remove(file_path)
+
+#     return {"message": "PDF processed successfully"}
 @app.post("/upload")
 async def upload_pdf(session_id: str = Form(...), file: UploadFile = File(...)):
+    try:
+        # ✅ Use Render-safe temp directory
+        file_path = f"/tmp/temp_{session_id}.pdf"
 
-    file_path = f"temp_{session_id}.pdf"
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    loader = PyPDFLoader(file_path)
-    docs = loader.load()
+        loader = PyPDFLoader(file_path)
+        docs = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=900,
-        chunk_overlap=200
-    )
-    chunks = splitter.split_documents(docs)
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=900,
+            chunk_overlap=200
+        )
+        chunks = splitter.split_documents(docs)
 
-    # Compute embeddings via HF API
-    embeddings_list = [get_embeddings(d.page_content)[0] for d in chunks]
+        # ✅ Batch HF embeddings instead of per chunk (prevents crash)
+        texts = [d.page_content for d in chunks]
+        embeddings_vectors = get_embeddings(texts)
 
-    vector_db = FAISS.from_texts([d.page_content for d in chunks], embeddings_list)
+        # ✅ Proper FAISS construction
+        vector_db = FAISS.from_embeddings(
+            text_embeddings=list(zip(texts, embeddings_vectors)),
+            embedding=None
+        )
 
-    sessions[session_id] = vector_db
+        sessions[session_id] = vector_db
 
-    # Clean up PDF
-    os.remove(file_path)
+        os.remove(file_path)
 
-    return {"message": "PDF processed successfully"}
+        return {"message": "PDF processed successfully"}
+
+    except Exception as e:
+        print("❌ UPLOAD ERROR:", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # ---------------- ASK QUESTION ----------------
 @app.post("/ask")
