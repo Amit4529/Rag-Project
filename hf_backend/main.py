@@ -30,10 +30,15 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 # sessions in RAM
 sessions = {}
 
-# 🔥 LOCAL EMBEDDINGS (stable)
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+embeddings = None
+
+def get_embeddings():
+    global embeddings
+    if embeddings is None:
+        embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+    return embeddings
 
 # Gemini
 llm = ChatGoogleGenerativeAI(
@@ -66,8 +71,9 @@ async def upload_pdf(session_id: str = Form(...), file: UploadFile = File(...)):
         )
         chunks = splitter.split_documents(docs)
 
-        # 🟢 Local embeddings → FAISS
-        vector_db = FAISS.from_documents(chunks, embeddings)
+        # Local embeddings → FAISS
+        # vector_db = FAISS.from_documents(chunks, embeddings)
+        vector_db = FAISS.from_documents(chunks, get_embeddings())
 
         sessions[session_id] = vector_db
         os.remove(file_path)
