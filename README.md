@@ -15,4 +15,46 @@ Feeds them into an LLM
 
 Generates accurate and context-aware answers
 
+🎯 Features
+
+🔍 Semantic Search using embeddings
+
+📄 Document ingestion (PDF / text / custom data)
+
+🤖 LLM-powered response generation
+
+⚡ Fast retrieval using vector database
+
+🌐 API-based interaction (Flask / FastAPI ready)
+
+📊 Scalable architecture
+
+
+🧠 How It Works
+User Query
+     ↓
+Convert to Embedding
+     ↓
+Search in Vector Database
+     ↓
+Retrieve Relevant Documents
+     ↓
+Pass Context + Query to LLM
+     ↓
+Generate Final Answer
+
+
+🛠️ Tech Stack
+
+Language: Python
+
+Framework: Flask / FastAPI
+
+Embeddings: OpenAI / Sentence Transformers
+
+Vector DB: FAISS / ChromaDB
+
 Update Await...
+LLM: OpenAI GPT / HuggingFace
+
+Frontend (optional): HTML, CSS, JS
