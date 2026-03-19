@@ -50,11 +50,10 @@ Language: Python
 
 Framework: Flask / FastAPI
 
-Embeddings: OpenAI / Sentence Transformers
+Embeddings:Sentence Transformers
 
-Vector DB: FAISS / ChromaDB
+Vector DB: FAISS
+
+Frontend: React
 
 Update Await...
-LLM: OpenAI GPT / HuggingFace
-
-Frontend (optional): HTML, CSS, JS
