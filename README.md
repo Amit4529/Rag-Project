@@ -6,7 +6,6 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)
 ![React](https://img.shields.io/badge/React-18-61DAFB)
 ![FAISS](https://img.shields.io/badge/VectorDB-FAISS-orange)
-![LLM](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash-purple)
 
 ---
 
@@ -15,7 +14,7 @@
 This project implements a **Retrieval-Augmented Generation (RAG)** pipeline that grounds LLM responses in your actual documents — eliminating hallucinations and improving answer accuracy.
 
 Instead of relying only on a language model's training data, this system:
-- 📥 Ingests your PDF documents (including scanned PDFs via OCR)
+- 📥 Ingests your PDF documents 
 - 🔍 Retrieves the most relevant chunks using semantic search
 - 🤖 Feeds context + query to Gemini LLM for accurate answers
 
@@ -29,7 +28,7 @@ Instead of relying only on a language model's training data, this system:
 - 🤖 **LLM-Powered Answers** — Gemini 2.5 Flash
 - 🌐 **REST API** — FastAPI backend deployed on HuggingFace Spaces
 - 🖥️ **React Frontend** — clean UI deployed on Vercel
-- 🔡 **Hybrid OCR Loader** — pymupdf + Tesseract for scanned documents
+
 
 ---
 
@@ -58,7 +57,7 @@ Generate Final Answer
 | Embeddings | HuggingFace (all-MiniLM-L6-v2) |
 | Vector Database | FAISS |
 | LLM | Gemini 2.5 Flash |
-| PDF Processing | pymupdf + Tesseract OCR |
+| PDF Processing | pymupdf |
 | Orchestration | LangChain |
 | Frontend | React + Vite |
 | Backend Hosting | HuggingFace Spaces |
