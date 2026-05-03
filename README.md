@@ -1,59 +1,67 @@
-🚀 RAG-Based Intelligent Question Answering System
+# 🧠 RAG-Based Intelligent Question Answering System
 
-⚡ Enhancing AI responses using Retrieval-Augmented Generation (RAG)
-📚 Combines document retrieval + LLM to provide accurate, context-aware answers
+> Upload any PDF and ask questions — get accurate, context-aware answers powered by Retrieval-Augmented Generation.
 
-📌 Overview
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)
+![React](https://img.shields.io/badge/React-18-61DAFB)
+![FAISS](https://img.shields.io/badge/VectorDB-FAISS-orange)
+![LLM](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash-purple)
 
-This project implements a Retrieval-Augmented Generation (RAG) system that improves the quality of AI-generated responses by grounding them in external knowledge sources.
+---
 
-Instead of relying only on a language model, this system:
+## 📌 Overview
 
-Retrieves relevant documents
+This project implements a **Retrieval-Augmented Generation (RAG)** pipeline that grounds LLM responses in your actual documents — eliminating hallucinations and improving answer accuracy.
 
-Feeds them into an LLM
+Instead of relying only on a language model's training data, this system:
+- 📥 Ingests your PDF documents (including scanned PDFs via OCR)
+- 🔍 Retrieves the most relevant chunks using semantic search
+- 🤖 Feeds context + query to Gemini LLM for accurate answers
 
-Generates accurate and context-aware answers
+---
 
-🎯 Features
+## 🎯 Features
 
-🔍 Semantic Search using embeddings
+- 📄 **PDF Ingestion** — supports both text-based and scanned PDFs
+- 🔍 **Semantic Search** — HuggingFace embeddings (all-MiniLM-L6-v2)
+- ⚡ **Fast Retrieval** — FAISS vector database
+- 🤖 **LLM-Powered Answers** — Gemini 2.5 Flash
+- 🌐 **REST API** — FastAPI backend deployed on HuggingFace Spaces
+- 🖥️ **React Frontend** — clean UI deployed on Vercel
+- 🔡 **Hybrid OCR Loader** — pymupdf + Tesseract for scanned documents
 
-📄 Document ingestion (PDF / text / custom data)
+---
 
-🤖 LLM-powered response generation
+## 🧠 How It Works
 
-⚡ Fast retrieval using vector database
-
-🌐 API-based interaction (Flask / FastAPI ready)
-
-📊 Scalable architecture
-
-
-🧠 How It Works
 User Query
-     ↓
-Convert to Embedding
-     ↓
-Search in Vector Database
-     ↓
-Retrieve Relevant Documents
-     ↓
-Pass Context + Query to LLM
-     ↓
+↓
+Convert to Embedding (HuggingFace)
+↓
+Semantic Search in FAISS Vector DB
+↓
+Retrieve Top-K Relevant Chunks
+↓
+Pass Context + Query to Gemini LLM
+↓
 Generate Final Answer
 
+---
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
-Language: Python
+| Layer | Technology |
+|---|---|
+| Language | Python 3.10+ |
+| Backend Framework | FastAPI |
+| Embeddings | HuggingFace (all-MiniLM-L6-v2) |
+| Vector Database | FAISS |
+| LLM | Gemini 2.5 Flash |
+| PDF Processing | pymupdf + Tesseract OCR |
+| Orchestration | LangChain |
+| Frontend | React + Vite |
+| Backend Hosting | HuggingFace Spaces |
+| Frontend Hosting | Vercel |
 
-Framework: Flask / FastAPI
-
-Embeddings:Sentence Transformers
-
-Vector DB: FAISS
-
-Frontend: React
-
-Update Await...
+----------------------------------------------------

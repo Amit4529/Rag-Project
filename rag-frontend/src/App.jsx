@@ -30,7 +30,7 @@ function App() {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const API = "https://amit0310-rag-project.hf.space";
+  const API = import.meta.env.VITE_API_URL;
 
   // ─── Toast system ───
   const showToast = useCallback((message, type = "success") => {
